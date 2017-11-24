@@ -102,7 +102,7 @@ legend('Verlet Corrected','Verlet LeapFrogging','Exact')
 xlabel('Time (s)')
 ylabel('Energy (J)')
 title('Comparison of corrected and normal Verlet leapfrog')
-%% ode45
+%% ODE45
 x0 = [1 1];                                            % initial conditions
 tspan = [0; T];
 [t_ode, xy_ode45] = ode45(@harmOscill, 0:0.05:tspan(2), x0);
@@ -126,11 +126,11 @@ title('ode45 Vs Exact')
 %% comparing energies
 figure()
 hold on
-plot(t,tot_euler)
-plot(t_ode,tot_ode45);
-plot(t,tot_verlet)
+plot(t,total_euler)
+plot(t_ode,total_ode45,'k*');
+plot(t,total_leap_avg)
 plot(t, tot_exact)
-legend('Euler','ode45','Verlet Leapfrog','Exact')
+legend('Euler','ODE45','Leapfrog','Exact')
 %% Friction using Leapfrog
 x_leap = zeros(length(t),1);         w = zeros(length(t),1);
 
