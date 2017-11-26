@@ -3,7 +3,7 @@ clc; clear variables; close all;
 global m k gamma f omega
 m = 2;                              % mass;   
 k = 5;                              % spring   
-gamma = 0.3;                          % friction parameter
+gamma = 6;                          % friction parameter
 f = 0;                              % force amplitude
 omega = 0;                          % force frequency
 
@@ -11,7 +11,7 @@ omg = (k/m)^0.5;                    % frequency
 T_period = 2*pi/omg;
 omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );   % modified frequency for friction
 
-n = 20;                             % No. of cycles
+n = 10;                             % No. of cycles
 T = n*T_period;                     % Total time
 N = 10000;                          % No. of time steps    
 DeltaT = T/N;
