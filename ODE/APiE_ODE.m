@@ -1,17 +1,17 @@
 clc; clear variables; close all;
 %%%%%%%%%%%%%% Constants  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global m k gamma f omega
+global m k gamma f omg_f
 m = 2;                              % mass;   
 k = 5;                              % spring   
-gamma = 6;                          % friction parameter
-f = 0;                              % force amplitude
-omega = 0;                          % force frequency
+gamma = 0.3;                          % friction parameter
+f = 0.3;                              % force amplitude
+omg_f = 1;                          % force frequency
 
 omg = (k/m)^0.5;                    % frequency
 T_period = 2*pi/omg;
 omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );   % modified frequency for friction
 
-n = 10;                             % No. of cycles
+n = 2;                             % No. of cycles
 T = n*T_period;                     % Total time
 N = 10000;                          % No. of time steps    
 DeltaT = T/N;
@@ -80,13 +80,20 @@ v_leap = zeros(length(t),1);                 % Corrected velocity
 
 x_leap(1) = 1;       
 v_leap(1) = 1;
-w(1) = (v_leap(1) - 0.5*DeltaT*(-k*x_leap(1))/m )/(1 - ((gamma/m)*DeltaT/2));     % Euler step for -1/2 velocity        
+w(1) = (v_leap(1) - 0.5*DeltaT*(-k*x_leap(1))/m - ...
+        DeltaT*0.5*f/m*cos(omg_f*0.5*DeltaT))/(1 - ((gamma/m)*DeltaT/2));  % Euler step for -1/2 velocity        
+    
+%%% the velocity uses the normal points' displacements for the force term
+%%% while staggered points are being used for the friction term
 for i = 1:(length(t)-1)
-    w(i+1) = w(i) + DeltaT*(-k*x_leap(i))/m - gamma*w(i)*DeltaT/m ;               % the velocity uses the normal points' displacements for the force term, while staggered points are being used for the friction term
+    w(i+1) = w(i) + DeltaT*(-k*x_leap(i))/m - gamma*w(i)*DeltaT/m + ...
+            DeltaT*(f/m)*cos(((i+1)*DeltaT*omg_f));         
     x_leap(i+1) = x_leap(i) + DeltaT*w(i+1);
     v_leap(i) = 0.5 * (w(i+1) + w(i));
 end
-v_leap(end) = w(end) + 0.5*DeltaT*(-k*(x_leap(end)))/m - gamma*w(i)*0.5*DeltaT/m;
+v_leap(end) = w(end) + 0.5*DeltaT*(-k*x_leap(end))/m - gamma*w(end)*0.5*...
+            DeltaT/m + 0.5*DeltaT*(f/m)*cos(((i+1)*0.5*DeltaT*omg_f)); 
+
 
 [ kin_verlet_w, pot_verlet_w, tot_verlet_w] = calcEnergy(x_leap, w);        % Energies using the leap frogging velocities
 [ kin_verlet, pot_verlet, tot_verlet] = calcEnergy(x_leap, v_leap);         % Energies using corrected velocities
@@ -131,7 +138,7 @@ hold on
 plot(t_ode, xy_ode45(:,1));
 plot(t,x_leap)
 plot(t, x_anal(t));
-title('ode45 vs Exact')
+title('ode45 vs Verlet vs Exact')
 legend('ode45', 'Verlet', 'Exact')
 
 [ kin_ode45, pot_ode45, tot_ode45] = calcEnergy(xy_ode45(:,1), xy_ode45(:,2)); 
@@ -159,9 +166,3 @@ xlabel('Time (s)')
 ylabel('Energy (J')
 legend('Euler','ode45','Verlet Leapfrog','Exact')
 title('Comparison of total energies by different methods')
-%% Force using ODE
-x0 = [1 1];                             % initial conditions
-tspan = [0; T];
-[t_ode, xy_ode45] = ode45(@harmOscill_fric_force, tspan, x0);
-figure()
-plot(t_ode, xy_ode45(:,1));
