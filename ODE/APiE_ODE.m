@@ -11,7 +11,7 @@ omg = (k/m)^0.5;                    % frequency
 T_period = 2*pi/omg;
 omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );   % modified frequency for friction
 
-n = 2;                             % No. of cycles
+n = 10;                             % No. of cycles
 T = n*T_period;                     % Total time
 N = 10000;                          % No. of time steps    
 DeltaT = T/N;
@@ -21,22 +21,17 @@ t = 0:DeltaT:T;
 %x(0) = 1; v(0) = 1;
 %A = sqrt(1 + 1/omg^2);                              % Amplitude
 %phi = atan(-1/omg);
+
 A = sqrt(1 + ((1 + gamma/2/m)^2)/(omg_1^2));        % modified amplitude with friction
 phi = atan( - (1 + gamma/2/m)/omg_1 );              % modified phase factor with friction
+
+phi = acot(     )
+
 %x_anal = @(t) A*cos(omg*t + phi);   
 x_anal = @(t) A*exp((-gamma/2/m).*t).*cos(omg_1*t + phi);  % modified solution with friction
 %v_anal = @(t) -A*omg*sin(omg*t + phi);
 v_anal = @(t) A*( (-gamma/2/m) * exp((-gamma/2/m).*t).*cos(omg_1*t + phi) ...
                 - omg_1 * sin(omg_1*t + phi) .* exp((-gamma/2/m).*t));        % modified solution with friction  
-% syms x(t1) 
-% Du = diff(x);
-% cond1 = x(0) == 1;
-% cond2 = Du(0) == 1;
-% conds = [cond1 cond2];
-% x_anal = dsolve(diff(x,t1,2) + gamma*(diff(x,t1,1)) + omg^2 * (x) == 0, conds);
-% v_anal = diff(x_anal);
-% x_anal = eval(subs(x_anal,t));
-% v_anal = eval(subs(v_anal,t));
 %% Euler Algorithm
 x_euler = zeros(length(t),1);         
 v = zeros(length(t),1);
@@ -45,7 +40,8 @@ v(1) = 1;
 
 for i = 1:(length(t)-1)
     x_euler(i+1) = x_euler(i) + DeltaT*v(i);
-    v(i+1) = v(i) + (-k*x_euler(i))/m * DeltaT;
+    v(i+1) = v(i) + (-k*x_euler(i))/m * DeltaT + (-gamma*v(i)*DeltaT/m) ...
+            + f*cos(omg_f*i*DeltaT)*DeltaT/m;
 end
 
 [ kin_exact, pot_exact, tot_exact] = calcEnergy(x_anal(t),v_anal(t));
@@ -136,10 +132,11 @@ tspan = [0; T];
 figure()
 hold on
 plot(t_ode, xy_ode45(:,1));
+plot(t,x_euler)
 plot(t,x_leap)
 plot(t, x_anal(t));
-title('ode45 vs Verlet vs Exact')
-legend('ode45', 'Verlet', 'Exact')
+title('Displacement Comparison')
+legend('ode45', 'Euler', 'Verlet', 'Exact')
 
 [ kin_ode45, pot_ode45, tot_ode45] = calcEnergy(xy_ode45(:,1), xy_ode45(:,2)); 
 
