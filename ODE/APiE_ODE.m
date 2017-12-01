@@ -22,16 +22,42 @@ t = 0:DeltaT:T;
 %A = sqrt(1 + 1/omg^2);                              % Amplitude
 %phi = atan(-1/omg);
 
-A = sqrt(1 + ((1 + gamma/2/m)^2)/(omg_1^2));        % modified amplitude with friction
-phi = atan( - (1 + gamma/2/m)/omg_1 );              % modified phase factor with friction
+% A = sqrt(1 + ((1 + gamma/2/m)^2)/(omg_1^2));        % modified amplitude with friction
+% phi = atan( - (1 + gamma/2/m)/omg_1 );              % modified phase factor with friction
+% 
+% phi = acot(     )
+% 
+% %x_anal = @(t) A*cos(omg*t + phi);   
+% x_anal = @(t) A*exp((-gamma/2/m).*t).*cos(omg_1*t + phi);  % modified solution with friction
+% %v_anal = @(t) -A*omg*sin(omg*t + phi);
+% v_anal = @(t) A*( (-gamma/2/m) * exp((-gamma/2/m).*t).*cos(omg_1*t + phi) ...
+%                 - omg_1 * sin(omg_1*t + phi) .* exp((-gamma/2/m).*t));        % modified solution with friction  
 
-phi = acot(     )
 
-%x_anal = @(t) A*cos(omg*t + phi);   
-x_anal = @(t) A*exp((-gamma/2/m).*t).*cos(omg_1*t + phi);  % modified solution with friction
-%v_anal = @(t) -A*omg*sin(omg*t + phi);
-v_anal = @(t) A*( (-gamma/2/m) * exp((-gamma/2/m).*t).*cos(omg_1*t + phi) ...
-                - omg_1 * sin(omg_1*t + phi) .* exp((-gamma/2/m).*t));        % modified solution with friction  
+
+x_anal0 = 1;
+v_anal0 = 1;
+
+
+
+phi_d = 0;                                                                 % force phase
+phi = atan( (gamma*omg_f)/(k - m*omg_f^2)) - phi_d;                        % steady solution phase
+phi_h = atan((omg_prime* (x_anal0 - A*cos(phi)))/(v_anal0 ...              % transient solution phase
+        + (gamma/2/m) * (x_anal0 - A*cos(phi)) - A*omg_f*sin(phi)) );     
+
+omg_prime = sqrt( omg^2 - (gamma/2/m)^2 );                                 % damping reduced frequency
+
+A = (f/m)/(sqrt( (omg^2 - omg_f^2)^2  + 4*(gamma/2/m)^2*omg_f^2 ));        % steady state amplitude
+A_h = (x_anal0 - A*cos(phi))/sin(phi_h);                                   % transient amplitude  
+
+x_trans = A_h * exp(-gamma/2/m*t) .* sin(omg_prime*t + phi_h);             % transient solution
+x_steady = A*cos(omg_f*t - phi);                                           % steady state solution
+
+x_anal = @(t) x_trans + x_steady;                                          % net solution 
+% v_anal =  @(t) diff(x_anal)./diff(t);
+
+
+
 %% Euler Algorithm
 x_euler = zeros(length(t),1);         
 v = zeros(length(t),1);
