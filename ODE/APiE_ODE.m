@@ -3,61 +3,24 @@ clc; clear variables; close all;
 global m k gamma f omg_f
 m = 2;                              % mass;   
 k = 5;                              % spring   
-gamma = 0.3;                          % friction parameter
-f = 0.3;                              % force amplitude
-omg_f = 1;                          % force frequency
-
+gamma = 0.3;                        % friction parameter
+f = 2;                              % force amplitude
 omg = (k/m)^0.5;                    % frequency
+omg_f = 1.4*omg;                          % force frequency
+
 T_period = 2*pi/omg;
 omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );   % modified frequency for friction
 
-n = 10;                             % No. of cycles
+n = 30;                             % No. of cycles
 T = n*T_period;                     % Total time
 N = 10000;                          % No. of time steps    
 DeltaT = T/N;
 t = 0:DeltaT:T;
 %% Exact Solution
-% initial conditions ==>> 
-%x(0) = 1; v(0) = 1;
-%A = sqrt(1 + 1/omg^2);                              % Amplitude
-%phi = atan(-1/omg);
-
-% A = sqrt(1 + ((1 + gamma/2/m)^2)/(omg_1^2));        % modified amplitude with friction
-% phi = atan( - (1 + gamma/2/m)/omg_1 );              % modified phase factor with friction
-% 
-% phi = acot(     )
-% 
-% %x_anal = @(t) A*cos(omg*t + phi);   
-% x_anal = @(t) A*exp((-gamma/2/m).*t).*cos(omg_1*t + phi);  % modified solution with friction
-% %v_anal = @(t) -A*omg*sin(omg*t + phi);
-% v_anal = @(t) A*( (-gamma/2/m) * exp((-gamma/2/m).*t).*cos(omg_1*t + phi) ...
-%                 - omg_1 * sin(omg_1*t + phi) .* exp((-gamma/2/m).*t));        % modified solution with friction  
-
-
-
 x_anal0 = 1;
 v_anal0 = 1;
 
-
-
-phi_d = 0;                                                                 % force phase
-phi = atan( (gamma*omg_f)/(k - m*omg_f^2)) - phi_d;                        % steady solution phase
-phi_h = atan((omg_prime* (x_anal0 - A*cos(phi)))/(v_anal0 ...              % transient solution phase
-        + (gamma/2/m) * (x_anal0 - A*cos(phi)) - A*omg_f*sin(phi)) );     
-
-omg_prime = sqrt( omg^2 - (gamma/2/m)^2 );                                 % damping reduced frequency
-
-A = (f/m)/(sqrt( (omg^2 - omg_f^2)^2  + 4*(gamma/2/m)^2*omg_f^2 ));        % steady state amplitude
-A_h = (x_anal0 - A*cos(phi))/sin(phi_h);                                   % transient amplitude  
-
-x_trans = A_h * exp(-gamma/2/m*t) .* sin(omg_prime*t + phi_h);             % transient solution
-x_steady = A*cos(omg_f*t - phi);                                           % steady state solution
-
-x_anal = @(t) x_trans + x_steady;                                          % net solution 
-% v_anal =  @(t) diff(x_anal)./diff(t);
-
-
-
+[ x_trans, x_steady, x_anal, v_anal, A_total ] = exactSolutionFn( x_anal0, v_anal0,t );
 %% Euler Algorithm
 x_euler = zeros(length(t),1);         
 v = zeros(length(t),1);
@@ -70,26 +33,26 @@ for i = 1:(length(t)-1)
             + f*cos(omg_f*i*DeltaT)*DeltaT/m;
 end
 
-[ kin_exact, pot_exact, tot_exact] = calcEnergy(x_anal(t),v_anal(t));
+[ kin_exact, pot_exact, tot_exact] = calcEnergy(x_anal,v_anal);
 [ kin_euler, pot_euler, tot_euler ] = calcEnergy(x_euler,v);
 
 figure()
 hold on
-plot(t,x_euler)
-plot(t, x_anal(t))
-xlabel('Time (s)')
+plot(t/T_period,x_euler)
+plot(t/T_period, x_anal)
+xlabel('No. of cycles')
 ylabel('Displacement (m)')
 title('Euler vs Exact')
 legend('Numerical', 'Exact')
 
 figure()
 hold on
-plot(t,pot_euler);
-plot(t,kin_euler);
-plot(t,tot_euler);
-plot(t,tot_exact);
+plot(t/T_period,pot_euler);
+plot(t/T_period,kin_euler);
+plot(t/T_period,tot_euler);
+plot(t/T_period,tot_exact);
 legend('PE_{num}','KE_{num}','Tot_{num}','Tot_{exact}')
-xlabel('Time (s)')
+xlabel('No. of cycles')
 ylabel('Energy (J)')
 title('Euler vs Exact')
 %% Verlet Leapfrog Algorithm
@@ -122,45 +85,43 @@ v_leap(end) = w(end) + 0.5*DeltaT*(-k*x_leap(end))/m - gamma*w(end)*0.5*...
 
 figure()
 hold on
-plot(t,x_leap)
-plot(t, x_anal(t))
-xlabel('Time (s)')
+plot(t/T_period,x_leap)
+plot(t/T_period, x_anal)
+xlabel('No. of cycles')
 ylabel('Displacement (m)')
 title('Verlet Leapfrog vs Exact')
 legend('Numerical', 'Exact')
 
 figure()
 hold on
-plot(t,pot_verlet);
-plot(t,kin_verlet);
-plot(t,tot_verlet);
-plot(t,tot_exact);
+plot(t/T_period,pot_verlet);
+plot(t/T_period,kin_verlet);
+plot(t/T_period,tot_verlet);
+plot(t/T_period,tot_exact);
 legend('PE_{num}','KE_{num}','Tot_{num}','Tot_{exact}')
-xlabel('Time (s)')
+xlabel('No. of cycles')
 ylabel('Energy (J)')
 title('Verlet Leapfrog (corrected) vs Exact')
 
 figure()
 hold on
-plot(t,tot_verlet)
-plot(t,tot_verlet_w,'k--')
-plot(t, tot_exact)
+plot(t/T_period,tot_verlet)
+plot(t/T_period,tot_verlet_w,'k--')
+plot(t/T_period, tot_exact)
 legend('Verlet Corrected','Verlet LeapFrogging','Exact')
-xlabel('Time (s)')
+xlabel('No. of cycles')
 ylabel('Energy (J)')
 title('Comparison of corrected and normal Verlet leapfrog')
-xlabel('Time (s)')
-ylabel('Energy (J)')
 %% ode45
 x0 = [1 1];                                            % initial conditions
 tspan = [0; T];
-[t_ode, xy_ode45] = ode45(@harmOscill, 0:0.05:tspan(2), x0);
+[t_ode, xy_ode45] = ode23s(@harmOscill, 0:0.05:tspan(2), x0);
 figure()
 hold on
-plot(t_ode, xy_ode45(:,1));
-plot(t,x_euler)
-plot(t,x_leap)
-plot(t, x_anal(t));
+plot(t_ode/T_period, xy_ode45(:,1));
+plot(t/T_period,x_euler)
+plot(t/T_period,x_leap)
+plot(t/T_period, x_anal);
 title('Displacement Comparison')
 legend('ode45', 'Euler', 'Verlet', 'Exact')
 
@@ -170,22 +131,22 @@ figure()
 xlabel('Time (s)')
 ylabel('Energy (J)')
 hold on
-plot(t_ode,pot_ode45);
-plot(t_ode,kin_ode45);
-plot(t_ode,tot_ode45);
-plot(t,tot_exact);
+plot(t_ode/T_period,pot_ode45);
+plot(t_ode/T_period,kin_ode45);
+plot(t_ode/T_period,tot_ode45);
+plot(t/T_period,tot_exact);
 legend('PE_{num}','KE_{num}','Tot_{num}','Tot_{exact}')
-xlabel('Time (s)')
+xlabel('No. of cycles')
 ylabel('Energy (J)')
 title('ode45 Vs Exact')
 %% comparing energies
 figure()
 hold on
-plot(t,tot_euler)
-plot(t_ode,tot_ode45);
-plot(t,tot_verlet)
-plot(t, tot_exact)
-xlabel('Time (s)')
-ylabel('Energy (J')
+plot(t/T_period,tot_euler)
+plot(t_ode/T_period,tot_ode45);
+plot(t/T_period,tot_verlet)
+plot(t/T_period, tot_exact)
+xlabel('No. of cycles')
+ylabel('Energy (J)')
 legend('Euler','ode45','Verlet Leapfrog','Exact')
 title('Comparison of total energies by different methods')
