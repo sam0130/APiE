@@ -4,9 +4,9 @@ global m k gamma f omg_f
 m = 2;                                                                     % mass;   
 k = 5;                                                                     % spring   
 gamma = 0.3;                                                               % friction parameter
-f = 2*m;                                                                     % force amplitude
+f = 2*m;                                                                   % force amplitude
 omg = (k/m)^0.5;                                                           % frequency
-omg_f = 0.999*omg;                                                        % force frequency
+omg_f = 0.999*omg;                                                         % force frequency
 
 T_period = 2*pi/omg;
 omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );                              % modified frequency for friction
