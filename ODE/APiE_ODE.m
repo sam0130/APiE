@@ -1,26 +1,26 @@
 clc; clear variables; close all;
 %%%%%%%%%%%%%% Constants  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global m k gamma f omg_f
-m = 2;                              % mass;   
-k = 5;                              % spring   
-gamma = 0.3;                        % friction parameter
-f = 2;                              % force amplitude
-omg = (k/m)^0.5;                    % frequency
-omg_f = 1.4*omg;                          % force frequency
+m = 2;                                                                     % mass;   
+k = 5;                                                                     % spring   
+gamma = 0.3;                                                               % friction parameter
+f = 2*m;                                                                     % force amplitude
+omg = (k/m)^0.5;                                                           % frequency
+omg_f = 0.999*omg;                                                        % force frequency
 
 T_period = 2*pi/omg;
-omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );   % modified frequency for friction
+omg_1 = sqrt( (omg^2) - (( (gamma/m)^2)/4) );                              % modified frequency for friction
 
-n = 30;                             % No. of cycles
-T = n*T_period;                     % Total time
-N = 10000;                          % No. of time steps    
+n = 30;                                                                    % No. of cycles
+T = n*T_period;                                                            % Total time
+N = 10000;                                                                 % No. of time steps    
 DeltaT = T/N;
 t = 0:DeltaT:T;
 %% Exact Solution
 x_anal0 = 1;
 v_anal0 = 1;
-
-[ x_trans, x_steady, x_anal, v_anal, A_total ] = exactSolutionFn( x_anal0, v_anal0,t );
+[x_trans, x_steady, x_anal, v_anal, A_total] = exactSolutionFn(x_anal0, ...
+                                               v_anal0,t );
 %% Euler Algorithm
 x_euler = zeros(length(t),1);         
 v = zeros(length(t),1);
@@ -60,8 +60,8 @@ title('Euler vs Exact')
 % v_leap corrects the w by taking average of -1/2 and +1/2 velocity
 
 x_leap = zeros(length(t),1); 
-w = zeros(length(t),1);                      % 1/2 velocities
-v_leap = zeros(length(t),1);                 % Corrected velocity 
+w = zeros(length(t),1);                                                    % 1/2 velocities
+v_leap = zeros(length(t),1);                                               % Corrected velocity 
 
 x_leap(1) = 1;       
 v_leap(1) = 1;
@@ -80,8 +80,8 @@ v_leap(end) = w(end) + 0.5*DeltaT*(-k*x_leap(end))/m - gamma*w(end)*0.5*...
             DeltaT/m + 0.5*DeltaT*(f/m)*cos(((i+1)*0.5*DeltaT*omg_f)); 
 
 
-[ kin_verlet_w, pot_verlet_w, tot_verlet_w] = calcEnergy(x_leap, w);        % Energies using the leap frogging velocities
-[ kin_verlet, pot_verlet, tot_verlet] = calcEnergy(x_leap, v_leap);         % Energies using corrected velocities
+[ kin_verlet_w, pot_verlet_w, tot_verlet_w] = calcEnergy(x_leap, w);       % Energies using the leap frogging velocities
+[ kin_verlet, pot_verlet, tot_verlet] = calcEnergy(x_leap, v_leap);        % Energies using corrected velocities
 
 figure()
 hold on
@@ -125,7 +125,7 @@ plot(t/T_period, x_anal);
 title('Displacement Comparison')
 legend('ode45', 'Euler', 'Verlet', 'Exact')
 
-[ kin_ode45, pot_ode45, tot_ode45] = calcEnergy(xy_ode45(:,1), xy_ode45(:,2)); 
+[ kin_ode45, pot_ode45, tot_ode45]=calcEnergy(xy_ode45(:,1),xy_ode45(:,2)); 
 
 figure()
 xlabel('Time (s)')
