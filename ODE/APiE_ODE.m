@@ -1,6 +1,6 @@
 clc; clear variables; close all;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Constants  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-m = 2;                                                                     % mass;   
+m = 2;                                                                     % mass   
 k = 5;                                                                     % spring   
 gamma = 0.3;                                                               % friction parameter
 f = 3*m;                                                                   % force amplitude
@@ -38,8 +38,8 @@ for count = 1:length(omg_f)
     end
     A_Euler(count) = max(x_euler(cycles_steady));
 end
-[ kin_exact, pot_exact, tot_exact] = calcEnergy(x_anal,v_anal);
-[ kin_euler, pot_euler, tot_euler ] = calcEnergy(x_euler,v);
+[ kin_exact, pot_exact, tot_exact] = calcEnergy(x_anal,v_anal,m,k);
+[ kin_euler, pot_euler, tot_euler ] = calcEnergy(x_euler,v,m,k);
 %% Verlet Leapfrog Algorithm
 % w leap-frogs
 % v_leap corrects the w by taking average of -1/2 and +1/2 velocity
@@ -68,8 +68,8 @@ end
 v_leap(end) = w(end) + 0.5*DeltaT*(-k*x_leap(end))/m - gamma*w(end)*0.5*...
           DeltaT/m + 0.5*DeltaT*(f/m)*cos(((i+1)*0.5*DeltaT*omg_f(count))); 
 
-[ kin_verlet_w, pot_verlet_w, tot_verlet_w] = calcEnergy(x_leap, w);       % Energies using the leap frogging velocities
-[ kin_verlet, pot_verlet, tot_verlet] = calcEnergy(x_leap, v_leap);        % Energies using corrected velocities
+[ kin_verlet_w, pot_verlet_w, tot_verlet_w] = calcEnergy(x_leap, w, m,k);       % Energies using the leap frogging velocities
+[ kin_verlet, pot_verlet, tot_verlet] = calcEnergy(x_leap, v_leap,m,k);        % Energies using corrected velocities
 %% ode45
 x0=[1 1];                                                                  % initial conditions
 tspan=[0; T];
@@ -80,7 +80,7 @@ for count = 1:length(omg_f)
     [t_ode,xy_ode45]=ode45(odefun, 0:DeltaT:tspan(2), x0);
     A_ode45(count) = max(xy_ode45(cycles_steady,2));    
 end
-[ kin_ode45, pot_ode45, tot_ode45]=calcEnergy(xy_ode45(:,1),xy_ode45(:,2)); 
+[kin_ode45,pot_ode45,tot_ode45]=calcEnergy(xy_ode45(:,1),xy_ode45(:,2),m,k); 
 %% saving data
 filename = 'plotting.mat';
 save(filename)
