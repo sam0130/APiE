@@ -1,7 +1,9 @@
 function [ f_x, f_y ] = forces2D( x,y,k,re, C )
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
-
+%forces2D Calculates forces and potential energy
+%   Each particle pair considered only once
+%   Requires the C connectivity matric
+%   Uses Newton's third law to calculate equal opposite force on the jth
+%   paricle
 Np = size(x,2);
 
 f_x = zeros(Np,1);

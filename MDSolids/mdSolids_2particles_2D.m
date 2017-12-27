@@ -71,3 +71,7 @@ plot(position.x(:,1), t, '.')
 hold on;
 plot(position.x(:,2), t, '.')
 legend('particle 1', 'particle 2')
+
+% save data for animation
+filename =  'plotting.mat';
+save(filename)

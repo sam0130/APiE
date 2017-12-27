@@ -69,5 +69,7 @@ plot(t, U)
 plot(t, Ek)
 plot(t, U+Ek)
 
+filename =  'plotting.mat';
+save(filename)
 
 
