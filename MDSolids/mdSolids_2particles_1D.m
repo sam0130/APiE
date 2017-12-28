@@ -1,6 +1,6 @@
 %% MD solids
 
-clc; clear; close all;
+clc; clear; %close all;
 
 
 m = 2;                                                                     % Equal Mass of particles
@@ -20,12 +20,14 @@ t = 0:deltaT:N*tc;                                                         % Tim
 x = zeros(size(t,2),2);
 v = zeros(size(t,2),2);
 fc = zeros(size(t,2),2);
-
+Ek = zeros(size(t,2),1);
+U = zeros(size(t,2),1);
 
 x(1,:) = [0 x_e];                                                          % Initial positions 
 v(1,:) = [0 0.1];                                                          % Initial velocities
 fc(1,:) = force_2particles_1D(x(1,:),k,x_e);
-
+Ek(1) = sum(0.5*m*v(1,:).^2);
+U(1) = pot_energy(x(1,:), x_e, k);
 
 % first step
 x_prelim = x(1,:) - v(1,:)*deltaT;
@@ -42,12 +44,23 @@ for i=2:size(t,2)-1
     
     % central difference
     v(i,:) = (x(i+1,:) - x(i-1,:))/(2*deltaT);
+    
+    Ek(i) = sum(0.5*m*v(i,:).^2);
+    U(i) = pot_energy(x(i,:), x_e, k);
 end
 v(size(t,2), :) = (x(size(t,2),:) - x(size(t,2)-1,:))/(deltaT);    
-
+Ek(size(t,2)) = sum(0.5*m*v(size(t,2),:).^2);
+U(size(t,2)) = pot_energy(x(size(t,2),:), x_e, k);
 
 % plot 
 plot(x(:,1), t, '.')
 hold on;
 plot(x(:,2), t, '.')
 legend('particle 1', 'particle 2')
+
+% Energy plot
+figure()
+hold on
+plot(t, U)
+plot(t, Ek)
+plot(t, U+Ek)

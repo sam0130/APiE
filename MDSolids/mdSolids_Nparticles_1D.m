@@ -24,8 +24,8 @@ fc = zeros(size(t,2),Np);
 Ek = zeros(size(t,2),1);
 U = zeros(size(t,2),1);
 
-x(1,:) = [x_e 2*x_e 3*x_e 4*x_e 5*x_e + 0.1];                                        % Initial positions 
-v(1,:) = [0 0 0.0 0 0];                                                      % Initial velocities
+x(1,:) = [x_e 2*x_e 3*x_e 4*x_e 5*x_e ];                                        % Initial positions 
+v(1,:) = [0 0 0.1 0 0];                                                      % Initial velocities
 fc(1,:) = force_Nparticles_1D(x(1,:),k,x_e);
 Ek(1) = sum(0.5*m*v(1,:).^2);
 U(1) = pot_energy(x(1,:), x_e, k);
