@@ -12,10 +12,10 @@ omg = (omg_0^2 - eta^2)^0.5;                                               % Eig
 
 N = 100;                                                                    % No. of contact cycles
 tc = pi/omg;                                                               % Contact duration
-Nt = 50;                                                                   % No of steps within contact
+Nt = 100;                                                                   % No of steps within contact
 deltaT = tc/Nt;                                                            % Time step, DT = Tc/Nt 
 t = 0:deltaT:N*tc;                                                         % Time vector
-Np = 13;                                                                    % No. of particles
+Np = 5;                                                                    % No. of particles
 
 % Allocating positions and velocities
 position.x = zeros(size(t,2),Np);                                          
@@ -42,9 +42,9 @@ end
 
 % Initial Conditions
 position.x(1,:) = 0:re:(Np-1)*re;                        
-%position.y(1,:) = [0 0 0 0 0];                        
-velocity.x(1,(Np+1)/2) = 1;                        
-%velocity.y(1,:) = [0 0 0 0 0]; 
+position.y(1,:) = [0 re re 0.5*re 0];                       
+velocity.x(1,(Np+1)/2) = 0.03;                        
+velocity.y(1,(Np+1)/2) = 0.03; 
 
 E_k(1) = sum( 0.5*m*(velocity.x(1,:).^2 + velocity.y(1,:).^2));
 [U(1),~,~] = forces2D(position.x(1,:),position.y(1,:),k, re, C);
@@ -56,9 +56,11 @@ E_k(1) = sum( 0.5*m*(velocity.x(1,:).^2 + velocity.y(1,:).^2));
 x_prelim = position.x(1,:) - velocity.x(1,:)*deltaT;
 y_prelim = position.y(1,:) - velocity.y(1,:)*deltaT;
 
-position.x(2,1) = 0;
-position.y(2,1) = 0; 
+% Left wall                         
+position.x(2,1) = 0;           
+position.y(2,1) = 0;            
 
+% Right wall
 position.x(2,end) = (Np-1)*re;
 position.y(2,end) = 0; 
 

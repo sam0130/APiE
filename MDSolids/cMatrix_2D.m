@@ -1,28 +1,8 @@
-clear variables; close all; clc;
+function [ C ] = cMatrix_2D( Np )
+%CMATRIX_2D connectivity matrix for 2D square lattice
+%   Considers diagonal and vertical/horizontal springs
 
-Np = 9;
-%% Square lattice
-C_sq = zeros(Np,Np);
-for i = 1:Np-1
-    for j = i+1 : Np
-        C_sq(i,j) = 1;
-        C_sq(j,i) = 1;
-    end
-end
-
-%% Linear Lattice
-C_lin = zeros(Np,Np);
-for i = 1:Np-1
-    for j = i+1 : Np
-        if(abs(i-j)==1) 
-        C_lin(i,j) = 1;
-        C_lin(j,i) = 1;
-        end
-    end
-end
-%%
-N = 4;  
-r = N; c = N;                        %# Get the matrix size
+r = Np; c = Np;                        %# Get the matrix size
 diagVec1 = repmat([ones(c-1,1); 0],r,1);  %# Make the first diagonal vector
                                           %#   (for horizontal connections)
 diagVec1 = diagVec1(1:end-1);             %# Remove the last value
@@ -36,6 +16,6 @@ adj = diag(diagVec1,1)+...                %# Add the diagonals to a zero matrix
       diag(diagVec2,c-1)+...
       diag(diagVec3,c)+...
       diag(diagVec4,c+1);
-adj = adj+adj.'; 
+C = adj+adj.'; 
+end
 
-spy(adj)
