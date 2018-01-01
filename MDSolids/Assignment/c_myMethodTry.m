@@ -19,21 +19,11 @@ for i = 1:((Np^2)-1)
     for j = i+1:Np^2
         
         d = sqrt((Px(i) - Px(j))^2 + (Py(i) - Py(j))^2);    % distance b/w particles
-        if(d ==0.5 || d == sqrt(2)*0.5)
+        if(d ==0.5 )
              D(i,j) = 1;
          end
     end
 end
 
-% for i = 1:Np
-%     for j = 1 : Np
-%         k_part = (i-1)*Np + j; 
-%         d = sqrt((Xp(i) - Xp(j))^2 + (Yp(i) - Yp(j))^2);    % distance b/w particles
-%           
-%         if(d ==0.5)
-%             D(1,k_part) = 1
-%         end
-%     end
-% end
-%B = D;
+
 C = D+D';

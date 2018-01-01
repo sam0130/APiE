@@ -16,7 +16,7 @@ Nt = 100;                                                                  % No 
 deltaT = tc/Nt;                                                            % Time step, DT = Tc/Nt 
 t = 0:deltaT:N*tc;                                                         % Time vector
 Np = 4;                                                                   % No. of particles in the x and y directions                                               
-Vo = 0.9;                                                                  % Supplied velocity 
+Vo = 0.3;                                                                  % Supplied velocity 
 
 % Allocating positions and velocities
 position.x = zeros(size(t,2),Np^2);                                          
@@ -28,10 +28,7 @@ f.y = zeros(size(t,2),Np^2);
 
 % Initialize pot and kin energies
 U = zeros(size(t,2),1);
-E_k = zeros(size(t,2),1);
-
-% Connectivity matrix for 2D square lattice
-[ C ] = cMatrix_2D( Np );                                                            
+E_k = zeros(size(t,2),1);                                                           
 
 % Initial Conditions 
 xp = 0:re:(Np-1)*re;
@@ -51,12 +48,15 @@ end
 % Initial Velocities
 velocity.y(1,Np^2) = Vo;                         % velocity for the top-right corner particle 
 
+% Connectivity matrix for 2D square lattice
+[ C ] = cMatrix_2D_distMethod( Np, position ); 
+
 % Initial Energies
 E_k(1) = sum( 0.5*m*(velocity.x(1,:).^2 + velocity.y(1,:).^2));
 [U(1),~,~] = forces2D(position.x(1,:),position.y(1,:),k, re, C);
 
 % constraint and no constraint indices
-no_constraint = 1:Np^2;                  % vector of particle nos [1 2 3 ....]
+no_constraint = 1:Np^2;                         % vector of particle nos [1 2 3 ....]
 bottom_constraint = 1:Np;
 left_constraint = 1:Np:(Np*(Np-1))+1;
 net_constraint = union(bottom_constraint, left_constraint);
