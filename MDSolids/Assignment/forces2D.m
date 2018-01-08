@@ -13,7 +13,12 @@ for i = 1:Np-1
     for j = i+1 : Np
         if(C(i,j)==1)
             d = sqrt((x(i) - x(j))^2 + (y(i) - y(j))^2);    % distance b/w particles
-            del = -(d - re);                                % spring compression            
+            if(d~=re)
+                re_new = sqrt(2)*re;
+            else
+                re_new = re;
+            end
+            del = -(d - re_new);                                % spring compression            
             if(d==0.5)
                 f_ij = k*del;                                   % force magnitude
             else

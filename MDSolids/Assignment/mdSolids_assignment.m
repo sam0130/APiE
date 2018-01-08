@@ -3,20 +3,21 @@
 clc; clear; close all;
 
 m = 2;                                                                     % Equal Mass of particles
-k = 5;                                                                     % Spring Constant
-gamma = 0;                                                                 % Friction parameter                      
-re = 0.5;                                                                  % Equillibrium length of spring 
+k = 5;                                                                    % Spring Constant
 omg_0 = (k/m)^0.5;                                                         % Elastic frequency 
-eta = gamma/2/m;                                                           % Viscous dissipation                                                
+eta = ((log(2)*omg_0/pi)^2)/( 1 + (log(2)/pi)^2);                          % coeffecient of rest = 0.5
+eta = sqrt(eta);
+re = 0.5;                                                                  % Equillibrium length of spring 
+gamma = 0;  %2*m*eta;
 omg = (omg_0^2 - eta^2)^0.5;                                               % Eigen frequency 
 
-N = 10;                                                                    % No. of contact cycles
+N = 50;                                                                    % No. of contact cycles
 tc = pi/omg;                                                               % Contact duration
-Nt = 100;                                                                  % No of steps within contact
+Nt = 50;                                                                  % No of steps within contact
 deltaT = tc/Nt;                                                            % Time step, DT = Tc/Nt 
 t = 0:deltaT:N*tc;                                                         % Time vector
-Np = 4;                                                                   % No. of particles in the x and y directions                                               
-Vo = 0.3;                                                                  % Supplied velocity 
+Np = 3;                                                                   % No. of particles in the x and y directions                                               
+Vo = 0.1;                                                                  % Supplied velocity 
 
 % Allocating positions and velocities
 position.x = zeros(size(t,2),Np^2);                                          
@@ -70,14 +71,24 @@ x_prelim = position.x(1,:) - velocity.x(1,:)*deltaT;
 y_prelim = position.y(1,:) - velocity.y(1,:)*deltaT;
 
 % x and y position update for all non-constrained particles
-position.x(2,no_constraint) = 2*position.x(1,no_constraint) - x_prelim(no_constraint) + (deltaT^2)*(f.x(1,no_constraint)/m);
-position.y(2,no_constraint) = 2*position.y(1,no_constraint) - y_prelim(no_constraint) + (deltaT^2)*(f.y(1,no_constraint)/m);
+%position.x(2,no_constraint) = 2*position.x(1,no_constraint) - x_prelim(no_constraint) + (deltaT^2)*(f.x(1,no_constraint)/m);
+%position.y(2,no_constraint) = 2*position.y(1,no_constraint) - y_prelim(no_constraint) + (deltaT^2)*(f.y(1,no_constraint)/m);
+
+denom = (1 + gamma*deltaT/2/m);
+
+position.x(2,no_constraint) = (2*position.x(1,no_constraint) + (-1 + (gamma*deltaT/2/m))*x_prelim(no_constraint) + (deltaT^2)*(f.x(1,no_constraint)/m))/denom;
+position.y(2,no_constraint) = (2*position.y(1,no_constraint) + (-1 + (gamma*deltaT/2/m))*y_prelim(no_constraint) + (deltaT^2)*(f.y(1,no_constraint)/m))/denom;
+
 
 % y update for left constraint
-position.y(2,left_constraint) = 2*position.y(1,left_constraint) - y_prelim(left_constraint) + (deltaT^2)*(f.y(1,left_constraint)/m);
+%position.y(2,left_constraint) = 2*position.y(1,left_constraint) - y_prelim(left_constraint) + (deltaT^2)*(f.y(1,left_constraint)/m);
+position.y(2,left_constraint) = (2*position.y(1,left_constraint) + (-1 + (gamma*deltaT/2/m))*y_prelim(left_constraint) + (deltaT^2)*(f.y(1,left_constraint)/m))/denom;
+
 
 % x update for bottom constraint
-position.x(2,bottom_constraint) = 2*position.x(1,bottom_constraint) - x_prelim(bottom_constraint) + (deltaT^2)*(f.x(1,bottom_constraint)/m);
+%position.x(2,bottom_constraint) = 2*position.x(1,bottom_constraint) - x_prelim(bottom_constraint) + (deltaT^2)*(f.x(1,bottom_constraint)/m);
+position.x(2,bottom_constraint) = (2*position.x(1,bottom_constraint) + (-1 + (gamma*deltaT/2/m))*x_prelim(bottom_constraint) + (deltaT^2)*(f.x(1,bottom_constraint)/m))/denom;
+
 
 % constraints
 position.y(2,bottom_constraint) = 0;
@@ -90,14 +101,21 @@ for i=2:size(t,2)-1
   
     % -----verlet ------%
     % x and y position update for all non-constrained particles
-    position.x(i+1,no_constraint) = 2*position.x(i,no_constraint) - position.x(i-1,no_constraint) + (deltaT^2)*(f.x(i,no_constraint)/m);
-    position.y(i+1,no_constraint) = 2*position.y(i,no_constraint) - position.y(i-1,no_constraint) + (deltaT^2)*(f.y(i,no_constraint)/m);
+    %position.x(i+1,no_constraint) = 2*position.x(i,no_constraint) - position.x(i-1,no_constraint) + (deltaT^2)*(f.x(i,no_constraint)/m);
+    position.x(i+1,no_constraint) = (2*position.x(i,no_constraint) + (-1 + (gamma*deltaT/2/m))*position.x(i-1,no_constraint) + (deltaT^2)*(f.x(i,no_constraint)/m))/denom;
+    %position.y(i+1,no_constraint) = 2*position.y(i,no_constraint) - position.y(i-1,no_constraint) + (deltaT^2)*(f.y(i,no_constraint)/m);
+    position.y(i+1,no_constraint) = (2*position.y(i,no_constraint) + (-1 + (gamma*deltaT/2/m))*position.y(i-1,no_constraint) + (deltaT^2)*(f.y(i,no_constraint)/m))/denom;
+
     
     % y update for left constraint
-    position.y(i+1,left_constraint) = 2*position.y(i,left_constraint) - position.y(i-1,left_constraint) + (deltaT^2)*(f.y(i,left_constraint)/m);
+    %position.y(i+1,left_constraint) = 2*position.y(i,left_constraint) - position.y(i-1,left_constraint) + (deltaT^2)*(f.y(i,left_constraint)/m);
+    position.y(i+1,left_constraint) = (2*position.y(i,left_constraint) + (-1 + (gamma*deltaT/2/m))*position.y(i-1,left_constraint) + (deltaT^2)*(f.y(i,left_constraint)/m))/denom;
 
+    
     % x update for bottom constraint
-    position.x(i+1,bottom_constraint) = 2*position.x(i,bottom_constraint) - position.x(i-1,bottom_constraint) + (deltaT^2)*(f.x(i,bottom_constraint)/m);
+    %position.x(i+1,bottom_constraint) = 2*position.x(i,bottom_constraint) - position.x(i-1,bottom_constraint) + (deltaT^2)*(f.x(i,bottom_constraint)/m);
+    position.x(i+1,bottom_constraint) = (2*position.x(i,bottom_constraint) + (-1 + (gamma*deltaT/2/m))*position.x(i-1,bottom_constraint) + (deltaT^2)*(f.x(i,bottom_constraint)/m))/denom;
+
     
     % constraints
     position.y(i+1,bottom_constraint) = 0;

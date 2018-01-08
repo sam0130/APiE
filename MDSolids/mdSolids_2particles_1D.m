@@ -5,7 +5,7 @@ clc; clear; %close all;
 
 m = 2;                                                                     % Equal Mass of particles
 k = 5;                                                                     % Spring Constant
-gamma = 0;                                                                 % Friction parameter                      
+gamma = 0.0;                                                                 % Friction parameter                      
 x_e = 0.5;                                                                 % Equillibrium length of spring
 omg_0 = (k/m)^0.5;                                                         % Elastic frequency 
 eta = gamma/2/m;                                                           % Viscous dissipation                                                
