@@ -16,8 +16,8 @@ tc = pi/omg;                                                               % Con
 Nt = 50;                                                                  % No of steps within contact
 deltaT = tc/Nt;                                                            % Time step, DT = Tc/Nt 
 t = 0:deltaT:N*tc;                                                         % Time vector
-Np = 7;                                                                   % No. of particles in the x and y directions                                               
-Vo = 0.1;                                                                  % Supplied velocity 
+Np = 8;                                                                   % No. of particles in the x and y directions                                               
+Vo = 0.5;                                                                  % Supplied velocity 
 
 % Allocating positions and velocities
 position.x = zeros(size(t,2),Np^2);                                          
@@ -50,7 +50,7 @@ end
 velocity.y(1,Np^2) = Vo;                         % velocity for the top-right corner particle 
 
 % Connectivity matrix for 2D square lattice
-[ C ] = cMatrix_2D_distMethod( Np, position ); 
+[ C ] = cMatrix_2D_distMethod( Np, position, re ); 
 
 % Initial Energies
 E_k(1) = sum( 0.5*m*(velocity.x(1,:).^2 + velocity.y(1,:).^2));

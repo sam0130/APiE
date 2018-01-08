@@ -11,19 +11,10 @@ f_y = zeros(Np,1);
 U = 0;
 for i = 1:Np-1
     for j = i+1 : Np
-        if(C(i,j)==1)
-            d = sqrt((x(i) - x(j))^2 + (y(i) - y(j))^2);    % distance b/w particles
-            if(d~=re)
-                re_new = sqrt(2)*re;
-            else
-                re_new = re;
-            end
-            del = -(d - re_new);                                % spring compression            
-            if(d==0.5)
-                f_ij = k*del;                                   % force magnitude
-            else
-                f_ij = (k/(sqrt(2)))*del;
-            end
+        if(C(i,j)~=0)
+            d = sqrt((x(i) - x(j))^2 + (y(i) - y(j))^2);           % distance b/w particles
+            del = -(d - re*C(i,j));                                % spring compression            
+            f_ij = C(i,j)*k*del;                                   % force magnitude
             n_x = (x(i) - x(j))/d;          % x unit vector
             n_y = (y(i) - y(j))/d;          % y unit vector
             
@@ -39,7 +30,7 @@ for i = 1:Np-1
             f_y(j) = f_y(j) - f_ij_y;
             
             % potential energy
-            U = U + 0.5*k*del^2;
+            U = U + 0.5*C(i,j)*k*del^2;
             
         end
     end
