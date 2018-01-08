@@ -22,7 +22,7 @@ for i = 1:Np-1
             if(d==0.5)
                 f_ij = k*del;                                   % force magnitude
             else
-                f_ij = (k/(sqrt(1)))*del;
+                f_ij = (k/(sqrt(2)))*del;
             end
             n_x = (x(i) - x(j))/d;          % x unit vector
             n_y = (y(i) - y(j))/d;          % y unit vector

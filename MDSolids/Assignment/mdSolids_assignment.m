@@ -8,7 +8,7 @@ omg_0 = (k/m)^0.5;                                                         % Ela
 eta = ((log(2)*omg_0/pi)^2)/( 1 + (log(2)/pi)^2);                          % coeffecient of rest = 0.5
 eta = sqrt(eta);
 re = 0.5;                                                                  % Equillibrium length of spring 
-gamma = 0;  %2*m*eta;
+gamma = 0; %2*m*eta;
 omg = (omg_0^2 - eta^2)^0.5;                                               % Eigen frequency 
 
 N = 50;                                                                    % No. of contact cycles
@@ -16,7 +16,7 @@ tc = pi/omg;                                                               % Con
 Nt = 50;                                                                  % No of steps within contact
 deltaT = tc/Nt;                                                            % Time step, DT = Tc/Nt 
 t = 0:deltaT:N*tc;                                                         % Time vector
-Np = 3;                                                                   % No. of particles in the x and y directions                                               
+Np = 7;                                                                   % No. of particles in the x and y directions                                               
 Vo = 0.1;                                                                  % Supplied velocity 
 
 % Allocating positions and velocities
